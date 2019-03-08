@@ -3,7 +3,7 @@
 Usage: dyn_gandi [--help] [--verbose] [--dry-run] [--conf=<c>] [--log=<l>] [--out=<o>] [options]...
 
 Options:
-  -c --conf=<c>         Configuration file. [default: config.ini].
+  -c --conf=<c>         Configuration file. [default: config.json].
   -d --debug            Debug mode.
   --dry-run             Display informations quits without modifications.
   -h --help             Displays the help.
@@ -12,11 +12,9 @@ Options:
   -v --verbose          Displays more informations.
 
 """
-import configparser
 import json
 import os
 import sys
-from configparser import ConfigParser
 from datetime import datetime
 
 import docopt as docpt
@@ -35,7 +33,7 @@ log_file = None  # type: str
 out_file = None  # type: str
 
 # variables
-config = {}  # type: ConfigParser
+config = {}
 
 
 def parse_options():
@@ -54,15 +52,15 @@ def parse_configuration():
     """Parse configuration file."""
 
     if not os.path.exists(conf_file):
-        if conf_file == "config.ini":
-            raise RuntimeError("Configuration file not found. Copy the content of config.ini-dist to config.ini and complete the configuration.")
+        if conf_file == "config.json":
+            raise RuntimeError("Configuration file not found. Copy the content of config.json-dist to config.json and complete the configuration.")
         else:
             raise RuntimeError("Configuration file %s not found." % conf_file)
 
     global config
 
-    config = configparser.ConfigParser()
-    config.read(conf_file)
+    with open(conf_file, 'r') as f:
+        config = json.load(f)
 
 
 def livedns_handle(domain, ip, records):
@@ -162,7 +160,7 @@ def main():
         raise RuntimeWarning("IP resolver returned an error: %s" % str(e))
 
     if verbose:
-        print("Resolved IP: %s" % ip)
+        print("Resolved IP: %s\n" % ip)
 
     # Write IP file output
     if out_file:
@@ -180,29 +178,29 @@ def main():
                     print("Wrote %s to %s file." % (ip, out_file))
 
     # Query LiveDNS API
-    domain = config['dns']['domain']
-    if verbose:
-        print("Domain: %s" % domain)
+    for domain in config['domains']:
+        if verbose:
+            print("Domain: %s" % domain['name'])
 
-    records = []
-    for rec in config['dns']['records'].split(","):
-        records.append({"type": "A", "name": rec})
+        records = []
+        for rec in domain['records']:
+            records.append({"type": "A", "name": rec})
 
-    if not records:
-        raise RuntimeWarning("No records to update, check configuration.")
+        if not records:
+            raise RuntimeWarning("No records to update, check configuration.")
 
-    if verbose:
-        print("Records: %s" % ", ".join(map(lambda x: "%s/%s" %(x['name'], x['type']), records)))
+        if verbose:
+            print("Records: %s" % ", ".join(map(lambda x: "%s/%s" %(x['name'], x['type']), records)))
 
-    try:
-        action, message = livedns_handle(domain=domain, ip=ip, records=records)
-    except Exception as e:
-        action, message = "ERROR", "LiveDNS error: %s" % str(e)
-        to_log(message, action, datetime_label=today, dump=True)
+        try:
+            action, message = livedns_handle(domain=domain["name"], ip=ip, records=records)
+        except Exception as e:
+            action, message = "ERROR", "LiveDNS error: %s" % str(e)
+            to_log(message, action, datetime_label=today, dump=True)
 
-    # output log
-    if verbose:
-        print("")
+        # output log
+        if verbose:
+            print("")
 
     to_log(message, action, datetime_label=today, dump=True)
 

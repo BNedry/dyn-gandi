@@ -1,0 +1,20 @@
+{
+  "api": {
+    "url": "https://dns.api.gandi.net/api/v5",
+    "key": ""
+  },
+  "ip":{
+    "resolver_url": "https://ipecho.net/plain",
+    "resolver_url_alt": "https://ifconfig.me/ip"
+  },
+  "domains": [
+    {
+      "name": "",
+      "records": [
+        "@",
+        "www"
+      ],
+      "ttl": 3600
+    }
+  ]
+}
