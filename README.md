@@ -1,6 +1,8 @@
 # dyn-gandi
 Use Gandi LiveDNS API to update DNS records with a dynamic IP.
 
+#### Note
+This project is a fork from [Danamir/dyn-gandi](https://github.com/Danamir/dyn-gandi), slightly modified to allow the update of multiple domains at once.
 
 #### Prequisites
 
