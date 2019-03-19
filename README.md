@@ -17,7 +17,7 @@ Use Gandi LiveDNS API to update DNS records with a dynamic IP.
 
 ##### Installation from sources :
 ```shell
-$ curl --location https://github.com/Danamir/dyn-gandi/archive/master.zip --output dyn-gandi-master.zip
+$ curl --location https://github.com/BNedry/dyn-gandi/archive/master.zip --output dyn-gandi-master.zip
 $ unzip dyn-gandi-master.zip
 $ mv dyn-gandi-master/ dyn-gandi
 $ cd dyn-gandi
@@ -35,21 +35,13 @@ $ .env/Script/activate.bat (Windows)
 Install :
 ```shell
 $ python setup.py develop
-$ copy config.ini-dist config.ini
+$ copy config.json-dist config.json
 $ dyn_gandi --help
 -or-
 $ python dyn_gandi.py --help
 ```
 
-Complete the `config.ini` file, in particular check the lines :
-```ini
-[api]
-key =
-
-[dns]
-domain = 
-records = @,www
-```
+Complete the `config.json` file, in particular fill "api.key" and "domains[0].name".
 
 #### Running
 _Note: `dyn_gandi` can be substituted with `python dyn_gandi.py` if the former does'nt work._
